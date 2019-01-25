@@ -26,7 +26,8 @@
         "reflect-metadata": "~0.1.8",
         "rxjs": "~6.3.0",
         "tns-core-modules": "~5.0.2",
-        "zone.js": "^0.8.26"
+        "zone.js": "^0.8.26",
+        "kinvey-nativescript-sdk": "3.12.3"
     },
     "devDependencies": {
         "@nativescript/schematics": "~0.4.0",
