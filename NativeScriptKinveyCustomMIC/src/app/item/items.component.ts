@@ -1,21 +1,49 @@
 import { Component, OnInit } from "@angular/core";
-
-import { Item } from "./item";
-import { ItemService } from "./item.service";
-
+import { Kinvey } from "kinvey-nativescript-sdk";
 @Component({
     selector: "ns-items",
     moduleId: module.id,
     templateUrl: "./items.component.html",
 })
 export class ItemsComponent implements OnInit {
-    items: Item[];
 
-    // This pattern makes use of Angular’s dependency injection implementation to inject an instance of the ItemService service into this class.
-    // Angular knows about this service because it is included in your app’s main NgModule, defined in app.module.ts.
-    constructor(private itemService: ItemService) { }
+    constructor() { }
 
     ngOnInit(): void {
-        this.items = this.itemService.getItems();
+        // Initialize Kinvey.
+        Kinvey.init({
+            "appKey": "xxx",
+            "appSecret": "xxx",
+            "instanceId": "xxx"
+        });
+        // Ping backend.
+        Kinvey.ping()
+            .then((response) => {
+                console.log(`Kinvey Ping Success. Kinvey Service is alive, version: ${response.version}, response: ${response.kinvey}`);
+                this.login();
+            })
+            .catch((error) => {
+                console.log(`Kinvey Ping Failed. Response: ${JSON.stringify(error)}`);
+            });
+    }
+
+    // Handle login.
+    login() {
+        if (Kinvey.User.getActiveUser() == null) {
+            Kinvey.User.loginWithMIC(
+                'myscheme://',
+                Kinvey.AuthorizationGrant.AuthorizationCodeLoginPage,
+                { micId: 'xxx' }
+            )
+                .then((user: Kinvey.User) => {
+                    console.log("user: " + JSON.stringify(user));
+                })
+                .catch((error: Kinvey.BaseError) => {
+                    alert("An error occurred. Check your Kinvey settings.");
+                    console.log("error: " + error);
+                });
+        } else {
+            console.log(JSON.stringify(Kinvey.User.getActiveUser()));
+        }
     }
 }
